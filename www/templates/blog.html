@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}(( blog.name )){% endblock %}
+
+{% block beforehead %}
+
+<script>
+var comment_url = '/api/blogs/(( blog.id ))/comments';
+var page_url = '/blog/(( blog.id ))';
+</script>
+
+{% endblock %}
+
+{% block content %}
+<section id="inner-headline">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="pageTitle">(( blog.name ))</h2>
+            </div>
+        </div>
+    </div>
+    </section>
+    <section id="content">
+    <div class="container content">
+    <div class="row"> 
+        <div class="testimonials pull-right">
+            <div class="active item">
+            <div class="carousel-info">
+                <img class="uk-border-circle" width="60" height="60" src="(( blog.user_image ))">
+                <h3>(( blog.user_name ))</h3>
+                 <p class="uk-article-meta">发表于(( blog.created_at|datetime ))</p>
+           </div>
+           </div>
+           </div>
+        <article class="uk-article">
+           
+            <p>(( blog.html_content|safe ))</p>
+        </article>
+    </div>        
+
+    {% if __user__ %}
+    <div class="container">
+    <h3>发表评论</h3>
+
+    <article>
+        <div class="testimonials">
+        <div class="active item">
+        <div class="carousel-info">
+            <img alt="" src="(( __user__.image ))" width="50" height="50" class="pull-left">
+            <div class="pull-left">
+              <span class="testimonials-name">(( __user__.name )) </span>
+            </div>
+          </div>
+        </div>
+        </div>
+            <form id="form-comment" v-on:submit.prevent="submit" class="uk-form" >
+               
+                <div class="input-field"> 
+                    <p>{{ error }}</p>
+                <textarea v-model="text" rows="10" cols="100" required class="form-control materialize-textarea" 
+                           idation-required-message="Please enter your message" minlength="5" 
+                           data-validation-minlength-message="Min 5 characters" 
+                            maxlength="200" style="resize:none"></textarea>
+                             <label for="name" class="">   说点什么吧 </label> 
+              </div> 
+                <div class="uk-form-row">
+                    <button type="submit" class="btn btn-primary waves-effect waves-dark pull-right"> 发表评论</button>
+                </div>
+            </form>
+    </article>
+    </div>
+    {% endif %}
+       
+    <div class="container">
+        <h3>最新评论</h3>
+        <div class="row">
+            {% for comment in comments %}
+            <div class="col-md-4">
+                <div class="block-heading-two">
+                </div>  
+                 <div class="testimonials">
+                    <div class="active item">
+                      <blockquote><p>(( comment.html_content|safe ))</p>
+                      </blockquote>
+                      <div class="carousel-info">
+                        <img alt="" src="(( comment.user_image ))" width="50" height="50" class="pull-left">
+                        <div class="pull-left">
+                          <span class="testimonials-name">(( comment.user_name )) {% if comment.user_id==blog.user_id %}(作者){% endif %}</span>
+                          <span class="testimonials-post">(( comment.created_at|datetime ))</span>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p>还没有人评论...</p>
+            {% endfor %}
+        </div>
+    </div>
+ </div>
+ </section>
+{% endblock %}
+
+{% block afterboday %}
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#form-comment',
+        data: {
+            text  : '',
+            error : '',
+        },
+        methods: {
+            submit: function () {
+                var content = vm.text.trim();
+                if (content==='') {
+                    return vm.error = '请输入评论内容！';
+                }
+                $.post(comment_url, 
+                {
+                    content : content
+                }, 
+                function (err, r) {
+                    if (err) {
+                        if(err.message)
+                            return vm.error = err.message;
+                        else
+                            return location.assign(page_url);
+                    }
+                    return location.assign(page_url);
+                });
+            }
+        }
+    });
+    
+    
+</script>
+{% endblock %}

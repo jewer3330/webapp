@@ -1,0 +1,126 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}用户{% endblock %}
+
+{% block beforehead %}
+
+<script>
+
+function initVM(data) {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            users: data.users,
+            page: data.page
+        },
+        filters:{
+            formatDate:function (val) {
+                var value=new Date(val * 1000);
+                var year=value.getFullYear();
+                var month=padDate(value.getMonth()+1);
+                var day=padDate(value.getDate());
+                var hour=padDate(value.getHours());
+                var minutes=padDate(value.getMinutes());
+                var seconds=padDate(value.getSeconds());
+                return year+'-'+month+'-'+day+' '+hour+':'+minutes+':'+seconds;
+            }
+        },
+        methods: {
+            
+            page_user: function (index) {
+                location.assign('/manage/users?page='+index);
+            },
+        },
+       
+    });
+    $('#vm').show();
+}
+var padDate=function(va){
+     va=va<10?'0'+va:va;
+     return va
+}
+
+$(function() {
+    $('#vm').hide();
+    $.get('/api/users', {
+        page: ((page_index))  
+    }, function (results, err) {
+        $('#loading').hide();
+        initVM(results);
+    });
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+<!-- MAIN -->
+        <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div>
+                            <!-- TABLE HOVER -->
+                            <div class="panel">
+                                
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">users</h3>
+                                </div>
+
+                                <div id="loading">
+                                    <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                </div>
+                                <div id="vm" class="panel-body"  >
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th class="uk-width-5-10">名字</th>
+                                                <th class="uk-width-2-10">电子邮件</th>
+                                                <th class="uk-width-2-10">注册时间</th>
+                                                <th class="uk-width-1-10">最近登陆</th>
+                                                <th class="uk-width-1-10">UID</th>
+                                                <th class="uk-width-1-10">Device</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(user,index) in users">
+                                                <td>{{index}}</td>
+                                                <td>
+                                                    <img :src=user.image width="25px" height="25px"></img>
+                                                    <span >{{ user.name }}</span>
+                                                    <span v-if="user.admin" style="color:#d05"><i class="lnr lnr-lock"></i> 管理员</span></td>
+                                                <td>{{ user.email }}</a></td>
+                                                <td>{{ user.created_at | formatDate }}</td>
+                                                <td>
+                                                    {{ user.login_at | formatDate }}
+                                                </td>
+                                                <td>
+                                                    {{ user.id }}
+                                                </td>
+                                                <td>
+                                                    {{ user.device }}
+                                                </td>
+                                                
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div>
+                                        <a v-for="(item) in page.page_count">
+                                            <button type="button" v-if="item===page.page_index" class="btn btn-info" v-on:click="page_user(item)">{{item}}</button>
+                                            <button type="button" v-else class="btn btn-default" v-on:click="page_user(item)">{{item}}</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END TABLE HOVER -->
+                        </div>
+                    </div>
+            </div>
+            <!-- END MAIN CONTENT -->
+        </div>
+        
+        <!-- END MAIN -->
+{% endblock %}

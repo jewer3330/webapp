@@ -1,0 +1,172 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    {% block meta %}<!-- block meta  -->{% endblock %}
+    <meta charset="utf-8">
+    <!--    <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+       
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon.png">
+        
+    <title>{% block title %} ? {% endblock %}-dotdotgame</title>
+    <!-- <link rel="stylesheet" href="/static/css/uikit-rtl.css"> -->
+    <!-- <link rel="stylesheet" href="/static/css/uikit-rtl.min.css"> -->
+    <!-- <link rel="stylesheet" href="/static/css/uikit.css" /> -->
+    <!-- <link rel="stylesheet" href="/static/css/uikit.min.css" />-->
+
+
+    
+    <!-- new add -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <!-- VENDOR CSS -->
+    <link rel="stylesheet" href="/static/admin/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/admin/vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/admin/vendor/linearicons/style.css">
+    <!-- MAIN CSS -->
+    <link rel="stylesheet" href="/static/admin/css/main.css">
+    <!-- FOR DEMO PURPOSES ONLY. You should remove this in your project -->
+    <!-- <link rel="stylesheet" href="/static/admin/css/demo.css"> -->
+    <!-- GOOGLE FONTS -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700" rel="stylesheet">
+    <!-- ICONS -->
+    <!-- <link rel="apple-touch-icon" sizes="76x76" href="/static/admin/img/apple-icon.png">-->
+    <!-- <link rel="icon" type="image/png" sizes="96x96" href="/static/admin/img/favicon.png">-->
+    <!-- new end -->
+
+    {% block link %}{% endblock %}
+    
+    <!-- <script src="/static/js/jquery.min.js"></script> -->
+    <!-- <script src="/static/js/md5.js"></script> -->
+    <!-- <script src="/static/js/uikit.js"></script> -->
+    <!-- <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script> -->
+    <!-- <script src="/static/js/uikit-icons.js"></script> -->
+    <!-- <script src="/static/js/uikit.min.js"></script> -->
+    <!-- <script src="/static/js/uikit-icons.min.js"></script> -->
+
+    <!-- new add -->
+    <!-- Javascript -->
+    <script src="/static/admin/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/admin/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/admin/vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="/static/admin/scripts/klorofil-common.js"></script>
+
+    <script src="/static/js/wangEditor.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/crypto-js@3.1.9-1/crypto-js.js"></script>
+    <!-- new end -->
+    {% block beforehead %}<!-- before head  -->{% endblock %}
+</head>
+<body>
+    <!-- WRAPPER -->
+    <div id="wrapper">
+        <!-- NAVBAR -->
+        <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="brand">
+                <a href="/"><img src="/static/img/logo.png" alt="DotDotGame" class="img-responsive logo" width="25px" height="25px"></a>
+            </div>
+            <div class="container-fluid">
+                <div class="navbar-btn">
+                    <button type="button" class="btn-toggle-fullwidth"><i class="lnr lnr-arrow-left-circle"></i></button>
+                </div>
+                <form class="navbar-form navbar-left">
+                    <div class="input-group">
+                        <input type="text" value="" class="form-control" placeholder="查找...">
+                        <span class="input-group-btn"><button type="button" class="btn btn-primary">Go</button></span>
+                    </div>
+                </form>
+                
+                <div id="navbar-menu">
+                    <ul class="nav navbar-nav navbar-right">
+                        <!--<li class="dropdown">
+                            <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
+                                <i class="lnr lnr-alarm"></i>
+                                <span class="badge bg-danger">5</span>
+                            </a>
+                            <ul class="dropdown-menu notifications">
+                                <li><a href="#" class="notification-item"><span class="dot bg-warning"></span>Todo</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-danger"></span>Todo</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-success"></span>Todo</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-warning"></span>Todo</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-success"></span>Todo</a></li>
+                                <li><a href="#" class="more">See all notifications</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="lnr lnr-question-circle"></i> <span>Help</span> <i class="icon-submenu lnr lnr-chevron-down"></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Todo</a></li>
+                                <li><a href="#">Todo</a></li>
+                                <li><a href="#">Todo</a></li>
+                                <li><a href="#">Todo</a></li>
+                            </ul>
+                        </li>
+                        -->
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="((__user__.image))" class="img-circle" alt="Avatar"> <span>((__user__.name))</span> <i class="icon-submenu lnr lnr-chevron-down"></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/signout"><i class="lnr lnr-exit"></i> <span>退出</span></a></li>
+                            </ul>
+                        </li>
+                        <!-- <li>
+                            
+                        </li> -->
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- END NAVBAR -->
+
+         <!-- LEFT SIDEBAR -->
+        <div id="sidebar-nav" class="sidebar">
+            <div class="sidebar-scroll">
+                <nav>
+                    <ul class="nav">
+                        <li><a href="/manage/blogs" 
+                            {% if page_name == "blogs" %} class="active" {% else %}
+                        {% endif %}>
+                        <i class="lnr lnr-dice"></i> <span>日志</span></a></li>
+                        <li><a href="/manage/users" 
+                            {% if page_name == "users" %} class="active" {% else %}
+                        {% endif %}>
+                        <i class="lnr lnr-user"></i> <span>用户</span></a></li>
+                        <li><a href="/manage/comments" 
+                            {% if page_name == "comments" %} class="active" {% else %}
+                        {% endif %}>
+                        <i class="lnr lnr-bookmark"></i> <span>评论</span></a></li>
+                        
+                        <li><a href="/manage/links" 
+                            {% if page_name == "links" %} class="active" {% else %}
+                        {% endif %}>
+                        <i class="lnr lnr-heart"></i> <span>链接</span></a></li>
+                        <li><a href="/manage/scores" 
+                            {% if page_name == "scores" %} class="active" {% else %}
+                        {% endif %}>
+                        <i class="lnr lnr-rocket"></i> <span>排行榜</span></a></li>
+                        <li><a href="/manage/shops" 
+                            {% if page_name == "shops" %} class="active" {% else %}
+                        {% endif %}>
+                        <i class="lnr lnr lnr-inbox"></i> <span>商店</span></a></li>
+                        <li><a href="/manage/events" 
+                            {% if page_name == "events" %} class="active" {% else %}
+                        {% endif %}>
+                        <i class="lnr lnr-chart-bars"></i> <span>数据</span></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <!-- END LEFT SIDEBAR -->
+
+        {% block content %}
+        {% endblock %}
+        
+        
+        
+    </div>
+    <!-- END WRAPPER -->
+    
+{% block afterboday %}<!-- before head  -->{% endblock %}
+
+</html>

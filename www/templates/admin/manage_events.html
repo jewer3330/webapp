@@ -1,0 +1,344 @@
+{% extends 'admin/manage_base.html' %}
+
+
+{% block link %}
+<link rel="stylesheet" href="/static/admin/vendor/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="/static/admin/vendor/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/static/admin/vendor/linearicons/style.css">
+<link rel="stylesheet" href="/static/admin/vendor/chartist/css/chartist-custom.css">
+{% endblock %}
+
+{% block title %}数据{% endblock %}
+
+{% block beforehead %}
+<script src="/static/admin/vendor/chartist/js/chartist.min.js"></script>
+<script src="/static/admin/scripts/laydate/laydate.js"></script>
+<script>
+$('#loading1').show();
+$('#loading2').show();
+$('#loading3').show();
+$('#loading4').show();
+$('#loading5').show();
+$('#loading6').show();
+
+function get_user_data(from_time,to_time) 
+{
+
+    var days = to_time - from_time;
+    var time = parseInt(days / (1000 * 60 * 60 * 24));
+    stamp =  parseInt(to_time.getTime() / 1000)
+    options = {
+            height: "270px",
+            showArea: true,
+            showLine: true,
+            showPoint: true,
+            axisX: {
+                showGrid: true
+            },
+            lineSmooth: true,
+        };
+
+    $.get('/api/active_users', {
+        deltaDay: time,
+        today: stamp
+    }, function (results, err) {
+        $('#loading1').hide();
+
+        for(var j = 0,len =  results.labels.length; j < len; j++)
+        {
+            results.labels[j] = timestampToTime(results.labels[j])
+        }
+
+        data =
+        {
+            labels : results.labels,
+            series: results.series
+        } 
+
+        new Chartist.Line('#demo-line-chart', data, options);
+    });
+
+    $.get('/api/reg_users', {
+        deltaDay: time,
+        today: stamp
+        
+    }, function (results, err) {
+        $('#loading2').hide();
+        for(var j = 0,len =  results.labels.length; j < len; j++)
+        {
+            results.labels[j] = timestampToTime(results.labels[j])
+        }
+        data =
+        {
+            labels : results.labels,
+            series: results.series
+        } 
+
+        new Chartist.Bar('#demo-bar-chart', data, options);
+    });
+
+
+    $.get('/api/one_day_keep', {
+        deltaDay: time,
+        today: stamp
+        
+    }, function (results, err) {
+        $('#loading3').hide();
+        for(var j = 0,len =  results.labels.length; j < len; j++)
+        {
+            results.labels[j] = timestampToTime(results.labels[j])
+        }
+        data =
+        {
+            labels : results.labels,
+            series: results.series
+        } 
+       
+
+        new Chartist.Line('#demo-one-chart', data, options);
+    });
+
+    $.get('/api/two_day_keep', {
+        deltaDay: time,
+        today: stamp
+        
+    }, function (results, err) {
+        $('#loading4').hide();
+        for(var j = 0,len =  results.labels.length; j < len; j++)
+        {
+            results.labels[j] = timestampToTime(results.labels[j])
+        }
+        data =
+        {
+            labels : results.labels,
+            series: results.series
+        } 
+       
+
+        new Chartist.Line('#demo-two-chart', data, options);
+    });
+
+    $.get('/api/three_day_keep', {
+        deltaDay: time,
+        today: stamp
+        
+    }, function (results, err) {
+        $('#loading5').hide();
+        for(var j = 0,len =  results.labels.length; j < len; j++)
+        {
+            results.labels[j] = timestampToTime(results.labels[j])
+        }
+        data =
+        {
+            labels : results.labels,
+            series: results.series
+        } 
+      
+        new Chartist.Line('#demo-three-chart', data, options);
+    });
+
+    $.get('/api/seven_day_keep', {
+        deltaDay: time,
+        today: stamp
+        
+    }, function (results, err) {
+        $('#loading6').hide();
+        for(var j = 0,len =  results.labels.length; j < len; j++)
+        {
+            results.labels[j] = timestampToTime(results.labels[j])
+        }
+        data =
+        {
+            labels : results.labels,
+            series: results.series
+        } 
+
+        new Chartist.Line('#demo-seven-chart', data, options);
+    });
+}
+
+
+$(function() {
+    var from =fun_date(-6)
+    var to = today()
+    get_user_data(from,to)
+    laydate.render({
+      elem: '#date1', 
+      value: from
+    });
+    laydate.render({
+      elem: '#date2', 
+      value:to
+    });
+    $('#vm').hide();
+    initVM();
+});
+
+
+ function initVM() {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+        },
+        methods: {
+            send: function () {
+                var a=document.getElementById("date1").value;  
+                var b=document.getElementById("date2").value;  
+                get_user_data(convertDateFromString(a),convertDateFromString(b))
+            },
+        }
+        
+    });
+    $('#vm').show();
+    
+}
+
+
+function timestampToTime(timestamp) {
+        var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        var D = date.getDate();
+        return Y+M+D;
+}
+
+function fun_date(deltaDay){
+        var date1 = new Date();
+        var date2 = new Date(date1.getFullYear(),date1.getMonth(),date1.getDate()+deltaDay,12,0,0);
+        return date2;
+}
+
+function today(){
+        var date1 = new Date();
+        var date2 = new Date(date1.getFullYear(),date1.getMonth(),date1.getDate(),12,0,0);
+        return date2;
+}
+
+
+function convertDateFromString(dateString) { 
+    var arr1 = dateString.split(" "); 
+    var sdate = arr1[0].split('-'); 
+    var date = new Date(sdate[0], sdate[1]-1, sdate[2],12,0,0);
+    return date;
+}
+</script>
+
+{% endblock %}
+
+{% block content %}
+<!-- MAIN -->
+        <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                    <h3 class="page-title">数据</h3>
+                    <div class="row">
+                        <div class="col-md-12">
+                        <div id="vm" class="panel" >
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">日期</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <span class="label label-default">开始日期(中国时间)</span>
+                                    <input type="text" id="date1" class="form-control" data-options="{'type':'YYYY-MM-DD','beginYear':2010,'endYear':2088}">
+                                <br>
+                                    <span class="label label-primary">结束日期(中国时间)</span>
+
+                                <input type="text" id="date2"  class="form-control" data-options="{'type':'YYYY-MM-DD','beginYear':2010,'endYear':2088}">
+                                <br>
+                                <button type="button"  class="btn btn-success" v-on:click="send">send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">活跃用户</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="loading1">
+                                        <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                    </div>
+                                    <div id="demo-line-chart" class="ct-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">新增用户</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="loading2">
+                                        <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                    </div>
+                                    <div id="demo-bar-chart" class="ct-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">1日留存</h3>
+                                </div>
+                                <div class="panel-body">
+                                     <div id="loading3">
+                                        <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                    </div>
+                                    <div id="demo-one-chart" class="ct-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">2日留存</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="loading4">
+                                        <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                    </div>
+                                    <div id="demo-two-chart" class="ct-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">3日留存</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="loading5">
+                                        <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                    </div>
+                                    <div id="demo-three-chart" class="ct-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">7日留存</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="loading6">
+                                        <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                    </div>
+                                    <div id="demo-seven-chart" class="ct-chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END MAIN CONTENT -->
+        </div>
+        
+        <!-- END MAIN -->
+{% endblock %}

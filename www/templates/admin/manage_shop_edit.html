@@ -1,0 +1,164 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}编辑商店{% endblock %}
+
+{% block beforehead %}
+
+<script>
+
+var
+    ID = '(( id ))',
+    action = '(( action ))';
+    vm = {}
+function initVM(shop) {
+    
+    vm = new Vue({
+        el: '#vm',
+        data: {
+           id : shop.id,
+           user_id : shop.user_id,
+           user_name : shop.user_name,
+           uesr_image : shop.uesr_image,
+           item1: shop.item1,
+           item2: shop.item2,
+           item3: shop.item3,
+           item4: shop.item4,
+           item5: shop.item5,
+           item6: shop.item6,
+           item7: shop.item7,
+           message : '',
+        },
+        methods: {
+            submit: function (event) {
+                event.preventDefault();
+                $.post(action, 
+                {
+                    uid : this.$data.user_id,
+                    item1 : this.$data.item1,
+                    item2 : this.$data.item2,
+                    item3 : this.$data.item3,
+                    item4 : this.$data.item4,
+                    item5 : this.$data.item5,
+                    item6 : this.$data.item6,
+                    item7 : this.$data.item7,
+                },
+                 function (ret, sucess) {
+                    if (ret) {
+                        if(ret.message)
+                        {
+                            vm.message = ret.message;
+                            return;
+                        }
+                        if(ID)
+                            return location.assign('/manage/shops/edit?id=' + ID);
+                        else
+                            return location.assign('/manage/shops');
+
+                    }
+                });
+            }
+        }
+    });
+    
+    $('#vm').show();
+    
+    
+}
+
+$(function () {
+    if (ID) {
+        $.get('/api/shops/' + ID, function (shop, sucess) {
+            if (shop) {
+                $('#loading').hide();
+                initVM(shop);
+            }
+           
+        });
+    }
+    else {
+        $('#loading').hide();
+        initVM({
+            id :'',
+            user_id: '',
+            user_name: '',
+            uesr_image: '',
+            item1: 0,
+            item2: 0,
+            item3: 0,
+            item4: 0,
+            item5: 0,
+            item6: 0,
+            item7: 0,
+        });
+    }
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+ <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                <div class="row">
+                    <div class="panel">
+                                
+                        <div class="panel-heading">
+                            <h3 class="panel-title">编辑商店</h3>
+                        </div>
+                <div id="vm" class="panel-body">
+                    
+                    <form v-on:submit="submit" >
+                        <div class="row">
+                            <label style="color:#d05">{{message}}</label>
+                        </div>
+                        <div class="row">
+                            <label >用户ID:</label>
+                                <input v-model="user_id" name="user_id" type="text" placeholder="用户ID" class="form-control">
+                        </div>
+                        <br>
+                        <div class="row">
+                            <label >小猪:</label>
+                                <input v-model="item1" name="item1" type="text" placeholder="0" class="form-control">
+                        </div>
+                        <div class="row">
+                            <label >小鹿:</label>
+                                <input v-model="item2" name="item2" type="text" placeholder="0" class="form-control">
+                        </div>
+                        <div class="row">
+                            <label >小狗:</label>
+                                <input v-model="item3" name="item3" type="text" placeholder="0" class="form-control">
+                        </div>
+                        <div class="row">
+                            <label >大象:</label>
+                                <input v-model="item4" name="item4" type="text" placeholder="0" class="form-control">
+                        </div>
+                        <div class="row">
+                            <label >熊猫:</label>
+                                <input v-model="item5" name="item5" type="text" placeholder="0" class="form-control">
+                        </div>
+                        <div class="row">
+                            <label >浣熊:</label>
+                                <input v-model="item6" name="item6" type="text" placeholder="0" class="form-control">
+                        </div>
+                        <div class="row">
+                            <label >小猫:</label>
+                                <input v-model="item7" name="item7" type="text" placeholder="0" class="form-control">
+                        </div>
+                        <br>
+                        <div class="row">
+                            <br>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                            <a href="/manage/shops" class="btn btn-default">取消</a>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+    </div>
+</div>
+</div>   
+{% endblock %}
+

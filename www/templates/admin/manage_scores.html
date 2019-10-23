@@ -1,0 +1,126 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}链接{% endblock %}
+
+{% block beforehead %}
+
+<script>
+var padDate=function(va){
+     va=va<10?'0'+va:va;
+     return va
+}
+function initVM(data) {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            scores: data.scores,
+            page: data.page
+        },
+        methods: {
+            edit_score: function (score) {
+                location.assign('/manage/scores/edit?id=' + score.id);
+            },
+            delete_score: function (score) {
+                if (confirm('确认要删除“' + score.user_name + '”？删除后不可恢复！')) {
+                    $.post('/api/scores/' + score.id + '/delete', function (err, r) {
+                        return location.assign('/manage/scores');
+                    });
+                }
+            },
+            page_score: function (index) {
+                location.assign('/manage/scores?page='+index);
+            },
+        },
+        filters:{
+            formatDate:function (val) {
+                var value=new Date(val * 1000);
+                var year=value.getFullYear();
+                var month=padDate(value.getMonth()+1);
+                var day=padDate(value.getDate());
+                var hour=padDate(value.getHours());
+                var minutes=padDate(value.getMinutes());
+                var seconds=padDate(value.getSeconds());
+                return year+'-'+month+'-'+day+' '+hour+':'+minutes+':'+seconds;
+            }
+        },
+    });
+    $('#vm').show();
+}
+
+$(function() {
+    $('#vm').hide();
+    $.get('/api/scores', {
+        page: ((page_index))
+    }, function (data, results) {
+        $('#loading').hide();
+        initVM(data);
+    });
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+    <!-- MAIN -->
+        <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                    <h3 class="page-title"><button type="button" class="btn btn-primary"><a  href="/manage/scores/create" title="增加测试分数"><i class="fa fa-rocket"></i> <span>增加测试分数</span></a></button>
+                    </h3>
+
+                    <div class="row">
+                        <div>
+                            <!-- TABLE HOVER -->
+                            <div class="panel">
+                                
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">scores</h3>
+                                </div>
+
+                                <div id="loading">
+                                    <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                </div>
+                                <div id="vm" class="panel-body"  >
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th class="uk-width-5-10">玩家名称</th>
+                                                <th class="uk-width-2-10">玩家分数</th>
+                                                <th class="uk-width-2-10">玩家皮肤</th>
+                                                <th class="uk-width-1-10">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(score,index) in scores">
+                                                <td>{{index}}</td>
+                                                <td><img :src=score.user_image width="25px" height="25px"></img>{{score.user_name}}</td>
+                                                <td>{{score.score}}</td>
+                                                <td>{{score.skin}}</td>
+                                                <td>
+                                                    <a  v-on:click="edit_score(score)"><i class="lnr lnr-pencil"></i>
+                                                    <a  v-on:click="delete_score(score)"><i class="lnr lnr-trash"></i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div>
+                                        <a v-for="(item) in page.page_count">
+                                            <button type="button" v-if="item===page.page_index" class="btn btn-info" v-on:click="page_score(item)">{{item}}</button>
+                                            <button type="button" v-else class="btn btn-default" v-on:click="page_score(item)">{{item}}</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END TABLE HOVER -->
+                        </div>
+                    </div>
+            </div>
+            <!-- END MAIN CONTENT -->
+        </div>
+        
+        <!-- END MAIN -->
+
+{% endblock %}

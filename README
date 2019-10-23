@@ -1,0 +1,10 @@
+#how to install
+1.python版本 3.6及以上
+2.安装aiomysql,aiohttp,jinja2
+3.安装mysql数据库
+4.在config.override.py配置数据库信息
+5.首先修改schema.py的数据库配置然后运行生成表
+
+开发效率提升
+pip3 install watchdog
+pip3 install fabric

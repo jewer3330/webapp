@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}登陆{% endblock %}
+
+{% block content %}
+<section id="inner-headline">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="pageTitle">登陆</h2>
+            </div>
+        </div>
+    </div>
+    </section>
+    <section id="content">
+    
+ <div class="container">
+        
+<div class="row">
+            <div class="col-lg-12">
+                <img src="/static/img/avatar.png" alt="">
+
+                <form id="app" v-on:submit.prevent="submit" class="uk-panel uk-panel-box uk-form">
+                    <div class="uk-form-row">
+                        {{ message }}
+                    </div>
+                    <div class="uk-form-row">
+                        <input class="uk-width-1-1 uk-form-large" type="text" placeholder="您的邮箱" v-model="email">
+                    </div>
+                    <div class="uk-form-row">
+                        <input class="uk-width-1-1 uk-form-large" type="password" placeholder="密码" v-model="password">
+                    </div>
+                    <div class="uk-form-row">
+                        <button type="submit" class="btn btn-primary waves-effect waves-dark pull-right"><i class="uk-icon-user"></i> 登陆</button>
+                    </div>
+                    <div class="uk-form-row uk-text-small">
+                        <a class="uk-float-right uk-link uk-link-muted" href="/resetpassword">忘记密码？</a>
+                    </div>
+                </form>
+
+           </div>
+    </div>
+        </div>
+</section>
+   
+
+{% endblock %}
+
+{% block afterboday %}
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            email  : '',
+            password : '',
+            message:'',
+        },
+        methods: {
+            submit: function () {
+                $.post('/api/auth', 
+                {
+                    email: vm.email,
+                    passwd: CryptoJS.SHA1(vm.email + ':' + vm.password).toString()
+                }, 
+                function (error, r) {
+                    if (error) {
+                        // var obj = JSON.parse(err)
+                        if(error.message)
+                            vm.message = error.message
+                        else
+                            return location.assign('/');
+                        // 
+                    }
+                    else
+                    {
+
+                        return location.assign('/');
+                    }
+
+                });
+            },
+
+        }
+    });
+
+</script>
+{% endblock %}

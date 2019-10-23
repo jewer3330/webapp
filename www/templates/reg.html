@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}注册{% endblock %}
+
+
+
+{% block content %}
+<section id="inner-headline">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="pageTitle">欢迎注册</h2>
+            </div>
+        </div>
+    </div>
+    </section>
+    <section id="content">
+    <div class="container">
+        <div class="row">
+        <form id="app" v-on:submit.prevent="submit" class="uk-form uk-form-stacked">
+            <!-- <p>{{ name }}</p> -->
+            <!-- <p>{{ email }}</p> -->
+            <!-- <p>{{ password1 }}</p> -->
+            <!-- <p>{{ password2 }}</p> -->
+            <p>{{ error }}</p>
+            <div class="uk-alert uk-alert-danger uk-hidden"></div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">名字:</label>
+                <div class="uk-form-controls">
+                    <input v-model="name" type="text" maxlength="50" placeholder="名字" class="uk-width-1-1">
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">电子邮件:</label>
+                <div class="uk-form-controls">
+                    <input v-model="email" type="text" maxlength="50" placeholder="your-name@example.com" class="uk-width-1-1">
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">输入口令:</label>
+                <div class="uk-form-controls">
+                    <input v-model="password1" type="password" maxlength="50" placeholder="输入口令" class="uk-width-1-1">
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">重复口令:</label>
+                <div class="uk-form-controls">
+                    <input v-model="password2" type="password" maxlength="50" placeholder="重复口令" class="uk-width-1-1">
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <button type="submit" class="btn btn-primary waves-effect waves-dark pull-right"><i class="uk-icon-user"></i> 注册</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block afterboday %}
+<!-- after boday  -->
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            name: '',
+            email: '',
+            password1: '',
+            password2: '',
+            error:'',
+        },
+        methods: {
+
+            reverseMessage: function () {
+                this.message = this.message.split('').reverse().join('')
+            },
+
+            submit: function () {
+                event.preventDefault();
+                var $form = vm.$el
+                if (! this.name.trim()) 
+                {
+                     this.error = '请输入名字';
+                     return false;
+                }
+                if (! validateEmail(this.email.trim().toLowerCase())) 
+                {
+                    this.error = '请输入正确的Email地址';
+                    return false;
+                }
+                if (this.password1.length < 6) 
+                {
+                    this.error = '口令长度至少为6个字符';
+                    return false;
+                }
+                if (this.password1 !== this.password2) 
+                {
+                    this.error = '两次输入的口令不一致';
+                    return false;
+                }
+                var email = this.email.trim().toLowerCase();
+                $.post('/api/reg', 
+                {
+                    name: this.name.trim(),
+                    email: email,
+                    passwd: CryptoJS.SHA1(email + ':' + this.password1).toString()
+                }, 
+                function (error, r) {
+                    if (error) {
+                        // var obj = JSON.parse(err)
+                        if(error.message)
+                            vm.message = error.message
+                        else
+                            return location.assign('/');
+                        // 
+                    }
+                    else
+                    {
+
+                        return location.assign('/');
+                    }
+                });
+            }
+        }
+    });
+</script>
+
+{% endblock %}

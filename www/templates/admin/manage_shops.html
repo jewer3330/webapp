@@ -1,0 +1,136 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}链接{% endblock %}
+
+{% block beforehead %}
+
+<script>
+var padDate=function(va){
+     va=va<10?'0'+va:va;
+     return va
+}
+function initVM(data) {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            shops: data.shops,
+            page: data.page
+        },
+        methods: {
+            edit_shop: function (shop) {
+                location.assign('/manage/shops/edit?id=' + shop.id);
+            },
+            delete_shop: function (shop) {
+                if (confirm('确认要删除“' + shop.user_name + '”？删除后不可恢复！')) {
+                    $.post('/api/shops/' + shop.id + '/delete', function (err, r) {
+                        return location.assign('/manage/shops');
+                    });
+                }
+            },
+            page_shop: function (index) {
+                location.assign('/manage/shops?page='+index);
+            },
+        },
+        filters:{
+            formatDate:function (val) {
+                var value=new Date(val * 1000);
+                var year=value.getFullYear();
+                var month=padDate(value.getMonth()+1);
+                var day=padDate(value.getDate());
+                var hour=padDate(value.getHours());
+                var minutes=padDate(value.getMinutes());
+                var seconds=padDate(value.getSeconds());
+                return year+'-'+month+'-'+day+' '+hour+':'+minutes+':'+seconds;
+            }
+        },
+    });
+    $('#vm').show();
+}
+
+$(function() {
+    $('#vm').hide();
+    $.get('/api/shops', {
+        page: ((page_index))
+    }, function (data, results) {
+        $('#loading').hide();
+        initVM(data);
+    });
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+    <!-- MAIN -->
+        <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                    <h3 class="page-title"><button type="button" class="btn btn-primary"><a  href="/manage/shops/create" title="增加测试分数"><i class="fa fa-rocket"></i> <span>增加商店数据</span></a></button>
+                    </h3>
+
+                    <div class="row">
+                        <div>
+                            <!-- TABLE HOVER -->
+                            <div class="panel">
+                                
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">shops</h3>
+                                </div>
+
+                                <div id="loading">
+                                    <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                </div>
+                                <div id="vm" class="panel-body"  >
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>玩家名称</th>
+                                                <th>小猪</th>
+                                                <th>小鹿</th>
+                                                <th>小狗</th>
+                                                <th>大象</th>
+                                                <th>熊猫</th>
+                                                <th>浣熊</th>
+                                                <th>小猫</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(shop,index) in shops">
+                                                <td>{{index}}</td>
+                                                <td><img :src=shop.user_image width="25px" height="25px"></img>{{shop.user_name}}</td>
+                                                <td>{{shop.item1}}</td>
+                                                <td>{{shop.item2}}</td>
+                                                <td>{{shop.item3}}</td>
+                                                <td>{{shop.item4}}</td>
+                                                <td>{{shop.item5}}</td>
+                                                <td>{{shop.item6}}</td>
+                                                <td>{{shop.item7}}</td>
+                                                <td>
+                                                    <a  v-on:click="edit_shop(shop)"><i class="lnr lnr-pencil"></i>
+                                                    <a  v-on:click="delete_shop(shop)"><i class="lnr lnr-trash"></i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div>
+                                        <a v-for="(item) in page.page_count">
+                                            <button type="button" v-if="item===page.page_index" class="btn btn-info" v-on:click="page_shop(item)">{{item}}</button>
+                                            <button type="button" v-else class="btn btn-default" v-on:click="page_shop(item)">{{item}}</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END TABLE HOVER -->
+                        </div>
+                    </div>
+            </div>
+            <!-- END MAIN CONTENT -->
+        </div>
+        
+        <!-- END MAIN -->
+
+{% endblock %}

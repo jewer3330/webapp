@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}错误{% endblock %}
+
+{% block content %}
+<section id="inner-headline">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="pageTitle">错误</h2>
+            </div>
+        </div>
+    </div>
+    </section>
+    <section id="content">
+    
+ <div class="container">
+        
+<div class="row">
+            <div class="col-lg-12">
+                <form id="app" class="uk-panel uk-panel-box uk-form">
+                    <div class="uk-form-row">
+                        {{ message }}
+                    </div>
+                </form>
+
+           </div>
+    </div>
+        </div>
+</section>
+   
+
+{% endblock %}
+
+{% block afterboday %}
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            message:'((message))',
+        },
+        
+    });
+       
+</script>
+{% endblock %}

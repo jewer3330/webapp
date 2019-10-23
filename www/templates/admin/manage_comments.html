@@ -1,0 +1,122 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}评论{% endblock %}
+
+{% block beforehead %}
+<script type="text/javascript">
+
+var padDate=function(va){
+         va=va<10?'0'+va:va;
+         return va
+    }
+function initVM(data) {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            comments: data.comments,
+            page: data.page
+        },
+        methods: {
+            delete_comment: function (comment) {
+                var content = comment.content.length > 20 ? comment.content.substring(0, 20) + '...' : comment.content;
+                if (confirm('确认要删除评论“' + comment.content + '”？删除后不可恢复！')) {
+                    $.post('/api/comments/' + comment.id + '/delete', function (err, r) {
+                       
+                        return location.assign('/manage/comments');
+                    });
+                }
+            }
+            ,
+            page_comment: function (index) {
+                location.assign('/manage/comments?page='+index);
+            },
+        }
+        ,
+        filters:{
+            formatDate:function (val) {
+                var value=new Date(val * 1000);
+                var year=value.getFullYear();
+                var month=padDate(value.getMonth()+1);
+                var day=padDate(value.getDate());
+                var hour=padDate(value.getHours());
+                var minutes=padDate(value.getMinutes());
+                var seconds=padDate(value.getSeconds());
+                return year+'-'+month+'-'+day+' '+hour+':'+minutes+':'+seconds;
+            }
+        },
+    });
+    $('#vm').show();
+    }
+
+$(function() {
+    $('#vm').hide();
+    $.get('/api/comments', {
+        page: ((page_index))
+    }, function (data, results) {
+        $('#loading').hide();
+        initVM(data);
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+    <!-- MAIN -->
+        <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div>
+                            <!-- TABLE HOVER -->
+                            <div class="panel">
+                                
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">comments</h3>
+                                </div>
+
+                                <div id="loading">
+                                    <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                </div>
+                                <div id="vm" class="panel-body"  >
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th class="uk-width-5-10">作者</th>
+                                                <th class="uk-width-2-10">内容</th>
+                                                <th class="uk-width-2-10">创建时间</th>
+                                                <th class="uk-width-1-10">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(comment,index) in comments">
+                                                <td>{{index}}</td>
+                                                <td><a>{{comment.user_name}}</a></td>
+                                                <td><a>{{comment.content}}</a></td>
+                                                <td>{{comment.created_at | formatDate}}</td>
+                                                <td>
+                                                    <a  v-on:click="delete_comment(comment)"><i class="lnr lnr-trash"></i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div>
+                                        <a v-for="(item) in page.page_count">
+                                            <button type="button" v-if="item===page.page_index" class="btn btn-info" v-on:click="page_comment(item)">{{item}}</button>
+                                            <button type="button" v-else class="btn btn-default" v-on:click="page_comment(item)">{{item}}</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END TABLE HOVER -->
+                        </div>
+                    </div>
+            </div>
+            <!-- END MAIN CONTENT -->
+        </div>
+        
+        <!-- END MAIN -->
+    
+{% endblock %}
+

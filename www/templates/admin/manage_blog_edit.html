@@ -1,0 +1,117 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}编辑日志{% endblock %}
+
+{% block beforehead %}
+
+<script>
+
+var
+    ID = '(( id ))',
+    action = '(( action ))';
+
+function initVM(blog) {
+    var E = window.wangEditor
+    var content = new E('#content')
+    // var summary = new E('#summary')
+    var vm = new Vue({
+        el: '#vm',
+        data: blog,
+        methods: {
+            submit: function (event) {
+                event.preventDefault();
+                this.$data.content = content.txt.html()
+                // this.$data.summary = summary.txt.html()
+                $.post(action, this.$data, function (ret, sucess) {
+                    if (ret) {
+                        if(ID)
+                            return location.assign('/manage/blogs/edit?id=' + ID);
+                        else
+                            return location.assign('/manage/blogs');
+
+                    }
+                });
+            }
+        }
+    });
+    
+    $('#vm').show();
+    
+    // 或者 var editor = new E( document.getElementById('editor') )
+    content.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
+    content.create()
+    content.txt.html(blog.content)
+
+    // summary.create()
+    // summary.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
+    // summary.txt.html(blog.summary)
+}
+
+$(function () {
+    if (ID) {
+        $.get('/api/blogs/' + ID, function (blog, sucess) {
+            if (blog) {
+                $('#loading').hide();
+                initVM(blog);
+            }
+           
+        });
+    }
+    else {
+        $('#loading').hide();
+        initVM({
+            name: '',
+            summary: '',
+            content: ''
+        });
+    }
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+<div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                <div class="row">
+                    <div class="panel">
+                                
+                        <div class="panel-heading">
+                            <h3 class="panel-title">编辑日志</h3>
+                        </div>
+                <div id="vm" class="panel-body">
+                    
+                    <form v-on:submit="submit" >
+                        
+                        <div class="row">
+                            <label >标题:</label>
+                                <input v-model="name" name="name" type="text" placeholder="标题" class="form-control">
+                        </div>
+                        <br>
+                        <div class="row">
+                            <label >摘要:</label>
+                            <textarea v-model="summary" rows="4" name="summary" placeholder="摘要" class="form-control"></textarea>
+                        </div>
+                        <br>
+                       <div class="row">
+                            <label >内容:</label>
+                        <div id="content" >
+                        </div>
+                        </div>
+                        <div class="row">
+                            <br>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                            <a href="/manage/blogs" class="btn btn-default">取消</a>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+

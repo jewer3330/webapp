@@ -1,0 +1,124 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}链接{% endblock %}
+
+{% block beforehead %}
+
+<script>
+var padDate=function(va){
+     va=va<10?'0'+va:va;
+     return va
+}
+function initVM(data) {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            links: data.links,
+            page: data.page
+        },
+        methods: {
+            edit_link: function (link) {
+                location.assign('/manage/links/edit?id=' + link.id);
+            },
+            delete_link: function (link) {
+                if (confirm('确认要删除“' + link.name + '”？删除后不可恢复！')) {
+                    $.post('/api/links/' + link.id + '/delete', function (err, r) {
+                        return location.assign('/manage/links');
+                    });
+                }
+            },
+            page_link: function (index) {
+                location.assign('/manage/links?page='+index);
+            },
+        },
+        filters:{
+            formatDate:function (val) {
+                var value=new Date(val * 1000);
+                var year=value.getFullYear();
+                var month=padDate(value.getMonth()+1);
+                var day=padDate(value.getDate());
+                var hour=padDate(value.getHours());
+                var minutes=padDate(value.getMinutes());
+                var seconds=padDate(value.getSeconds());
+                return year+'-'+month+'-'+day+' '+hour+':'+minutes+':'+seconds;
+            }
+        },
+    });
+    $('#vm').show();
+}
+
+$(function() {
+    $('#vm').hide();
+    $.get('/api/links', {
+        page: ((page_index))
+    }, function (data, results) {
+        $('#loading').hide();
+        initVM(data);
+    });
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+    <!-- MAIN -->
+        <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                    <h3 class="page-title"><button type="button" class="btn btn-primary"><a  href="/manage/links/create" title="新链接"><i class="fa fa-rocket"></i> <span>新链接</span></a></button>
+                    </h3>
+
+                    <div class="row">
+                        <div>
+                            <!-- TABLE HOVER -->
+                            <div class="panel">
+                                
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">links</h3>
+                                </div>
+
+                                <div id="loading">
+                                    <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                </div>
+                                <div id="vm" class="panel-body"  >
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th class="uk-width-5-10">名称</th>
+                                                <th class="uk-width-2-10">链接</th>
+                                                <th class="uk-width-1-10">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(link,index) in links">
+                                                <td>{{index}}</td>
+                                                <td>{{link.name}}</td>
+                                                <td><a :href="link.url">{{link.url}}</a></td>
+                                                <td>
+                                                    <a  v-on:click="edit_link(link)"><i class="lnr lnr-pencil"></i>
+                                                    <a  v-on:click="delete_link(link)"><i class="lnr lnr-trash"></i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div>
+                                        <a v-for="(item) in page.page_count">
+                                            <button type="button" v-if="item===page.page_index" class="btn btn-info" v-on:click="page_link(item)">{{item}}</button>
+                                            <button type="button" v-else class="btn btn-default" v-on:click="page_link(item)">{{item}}</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END TABLE HOVER -->
+                        </div>
+                    </div>
+            </div>
+            <!-- END MAIN CONTENT -->
+        </div>
+        
+        <!-- END MAIN -->
+
+{% endblock %}

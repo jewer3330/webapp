@@ -1,0 +1,126 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}编辑分数{% endblock %}
+
+{% block beforehead %}
+
+<script>
+
+var
+    ID = '(( id ))',
+    action = '(( action ))';
+    vm = {}
+function initVM(score) {
+    
+    vm = new Vue({
+        el: '#vm',
+        data: {
+           id : score.id,
+           user_id : score.user_id,
+           user_name : score.user_name,
+           uesr_image : score.uesr_image,
+           score : score.score,
+           message : '',
+        },
+        methods: {
+            submit: function (event) {
+                event.preventDefault();
+                if (isNaN(this.$data.score)) {
+                        this.$data.message = "请输入数字";
+                    return;
+                }
+                $.post(action, 
+                {
+                    uid : this.$data.user_id,
+                    score_point : this.$data.score,
+                },
+                 function (ret, sucess) {
+                    if (ret) {
+                        if(ret.message)
+                        {
+                            vm.message = ret.message;
+                            return;
+                        }
+                        if(ID)
+                            return location.assign('/manage/scores/edit?id=' + ID);
+                        else
+                            return location.assign('/manage/scores');
+
+                    }
+                });
+            }
+        }
+    });
+    
+    $('#vm').show();
+    
+    
+}
+
+$(function () {
+    if (ID) {
+        $.get('/api/scores/' + ID, function (score, sucess) {
+            if (score) {
+                $('#loading').hide();
+                initVM(score);
+            }
+           
+        });
+    }
+    else {
+        $('#loading').hide();
+        initVM({
+            id :'',
+            user_id: '',
+            user_name: '',
+            uesr_image: '',
+            score: '',
+        });
+    }
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+ <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                <div class="row">
+                    <div class="panel">
+                                
+                        <div class="panel-heading">
+                            <h3 class="panel-title">编辑分数</h3>
+                        </div>
+                <div id="vm" class="panel-body">
+                    
+                    <form v-on:submit="submit" >
+                        <div class="row">
+                            <label style="color:#d05">{{message}}</label>
+                        </div>
+                        <div class="row">
+                            <label >用户ID:</label>
+                                <input v-model="user_id" name="user_id" type="text" placeholder="用户ID" class="form-control">
+                        </div>
+                        <br>
+                        <div class="row">
+                            <label >用户分数:</label>
+                                <input v-model="score" name="score" type="text" placeholder="用户分数" class="form-control">
+                        </div>
+                        <br>
+                        <div class="row">
+                            <br>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                            <a href="/manage/scores" class="btn btn-default">取消</a>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+    </div>
+</div>
+</div>   
+{% endblock %}
+

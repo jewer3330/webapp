@@ -1,0 +1,98 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}编辑链接{% endblock %}
+
+{% block beforehead %}
+
+<script>
+
+var
+    ID = '(( id ))',
+    action = '(( action ))';
+
+function initVM(link) {
+    
+    var vm = new Vue({
+        el: '#vm',
+        data: link,
+        methods: {
+            submit: function (event) {
+                event.preventDefault();
+                $.post(action, this.$data, function (ret, sucess) {
+                    if (ret) {
+                        if(ID)
+                            return location.assign('/manage/links/edit?id=' + ID);
+                        else
+                            return location.assign('/manage/links');
+
+                    }
+                });
+            }
+        }
+    });
+    
+    $('#vm').show();
+    
+    
+}
+
+$(function () {
+    if (ID) {
+        $.get('/api/links/' + ID, function (link, sucess) {
+            if (link) {
+                $('#loading').hide();
+                initVM(link);
+            }
+           
+        });
+    }
+    else {
+        $('#loading').hide();
+        initVM({
+            name: '',
+            url: '',
+        });
+    }
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+ <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                <div class="row">
+                    <div class="panel">
+                                
+                        <div class="panel-heading">
+                            <h3 class="panel-title">编辑链接</h3>
+                        </div>
+                <div id="vm" class="panel-body">
+                    
+                    <form v-on:submit="submit" >
+                        <div class="row">
+                            <label >标题:</label>
+                                <input v-model="name" name="name" type="text" placeholder="标题" class="form-control">
+                        </div>
+                        <br>
+                        <div class="row">
+                            <label >链接:</label>
+                            <textarea v-model="url" rows="4" name="url" placeholder="链接" class="form-control"></textarea>
+                        </div>
+                        <div class="row">
+                            <br>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                            <a href="/manage/links" class="btn btn-default">取消</a>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+    </div>
+</div>
+</div>   
+{% endblock %}
+

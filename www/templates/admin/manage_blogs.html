@@ -1,0 +1,124 @@
+{% extends 'admin/manage_base.html' %}
+
+{% block title %}日志{% endblock %}
+
+{% block beforehead %}
+
+<script>
+var padDate=function(va){
+     va=va<10?'0'+va:va;
+     return va
+}
+function initVM(data) {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            blogs: data.blogs,
+            page: data.page
+        },
+        methods: {
+            edit_blog: function (blog) {
+                location.assign('/manage/blogs/edit?id=' + blog.id);
+            },
+            delete_blog: function (blog) {
+                if (confirm('确认要删除“' + blog.name + '”？删除后不可恢复！')) {
+                    $.post('/api/blogs/' + blog.id + '/delete', function (err, r) {
+                        return location.assign('/manage/blogs');
+                    });
+                }
+            },
+            page_blog: function (index) {
+                location.assign('/manage/blogs?page='+index);
+            },
+        },
+        filters:{
+            formatDate:function (val) {
+                var value=new Date(val * 1000);
+                var year=value.getFullYear();
+                var month=padDate(value.getMonth()+1);
+                var day=padDate(value.getDate());
+                var hour=padDate(value.getHours());
+                var minutes=padDate(value.getMinutes());
+                var seconds=padDate(value.getSeconds());
+                return year+'-'+month+'-'+day+' '+hour+':'+minutes+':'+seconds;
+            }
+        },
+    });
+    $('#vm').show();
+}
+
+$(function() {
+    $('#vm').hide();
+    $.get('/api/blogs', {
+        page: ((page_index))
+    }, function (data, results) {
+        $('#loading').hide();
+        initVM(data);
+    });
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+    <!-- MAIN -->
+        <div class="main">
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+                <div class="container-fluid">
+                    <h3 class="page-title"><button type="button" class="btn btn-primary"><a  href="/manage/blogs/create" title="新日志"><i class="fa fa-rocket"></i> <span>新日志</span></a></button></h3>
+                    
+                    <div class="row">
+                        <div>
+                            <!-- TABLE HOVER -->
+                            <div class="panel">
+                                
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">blogs</h3>
+                                </div>
+
+                                <div id="loading">
+                                    <button type="button" class="btn btn-primary" disabled="disabled"><i class="fa fa-spinner fa-spin"></i> 正在加载...</button>
+                                </div>
+                                <div id="vm" class="panel-body"  >
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th class="uk-width-5-10">标题 / 摘要</th>
+                                                <th class="uk-width-2-10">作者</th>
+                                                <th class="uk-width-2-10">创建时间</th>
+                                                <th class="uk-width-1-10">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(blog,index) in blogs">
+                                                <td>{{index}}</td>
+                                                <td><a>{{blog.name}} / {{blog.summary}}</a></td>
+                                                <td><a>{{blog.user_name}}</a></td>
+                                                <td>{{blog.created_at | formatDate}}</td>
+                                                <td>
+                                                    <a  v-on:click="edit_blog(blog)"><i class="lnr lnr-pencil"></i>
+                                                    <a  v-on:click="delete_blog(blog)"><i class="lnr lnr-trash"></i>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div>
+                                        <a v-for="(item) in page.page_count">
+                                            <button type="button" v-if="item===page.page_index" class="btn btn-info" v-on:click="page_blog(item)">{{item}}</button>
+                                            <button type="button" v-else class="btn btn-default" v-on:click="page_blog(item)">{{item}}</button>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- END TABLE HOVER -->
+                        </div>
+                    </div>
+            </div>
+            <!-- END MAIN CONTENT -->
+        </div>
+        
+        <!-- END MAIN -->
+{% endblock %}

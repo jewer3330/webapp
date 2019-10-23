@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}日志{% endblock %}
+
+{% block beforehead %}
+
+<script>
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+    <section id="banner">
+     
+    <!-- Slider -->
+        <div id="main-slider" class="flexslider">
+            <ul class="slides">
+                <li>
+                <img src="/static/img/slides/2.jpg" alt="" />
+                <div class="flex-caption">
+                    <h3><a href="https://bigbird.online/blog/00154322819579574e9883fd78d4fa08e99c9b736e8be98000" >SD Tank War</a></h3> 
+                </div>
+                </li>
+              <li>
+                <img src="/static/img/slides/1.jpg" alt="" />
+                <div class="flex-caption">
+                    <h3><a href="https://bigbird.online/blog/0015336316598405933ac4d03f641898e9cfd65a864c1ff000">王牌装甲</a></h3> 
+                </div>
+              </li>
+              
+              <li>
+                <img src="/static/img/slides/3.jpg" alt="" />
+                <div class="flex-caption">
+                    <h3><a href="https://bigbird.online/blog/00154329457352527768e9ac56d477987d156a37c852531000" >JUMP JUMP JUMP</a></h3> 
+                </div>
+                </li>
+            </ul>
+        </div>
+    <!-- end slider --> 
+    </section>  
+    <section id="content"> 
+    <div class="container">
+            <div class="row">
+            <div class="col-md-12">
+                <div class="aligncenter"><h2 class="aligncenter">最近动态</h2></div>
+                <br/>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for blog in blogs %}
+
+                <div class="col-sm-4 info-blocks">
+                 <div class="info-blocks-in">
+                    <h3><a href="/blog/(( blog.id ))" class="waves-effect waves-dark">(( blog.name ))</a></h3>
+                    <p>(( blog.summary ))</p>
+                    <p><img class="uk-border-circle" width="40" height="40" src="(( blog.user_image ))"> (( blog.user_name ))发表于(( blog.created_at|datetime ))</p>
+                    
+                </div>
+                
+               
+            </div>
+
+                <!-- <div class="col-sm-4 info-blocks">
+                        <div class="testimonials">
+                            <div class="active item">
+                            <div class="carousel-info">
+                            <img class="uk-border-circle" width="60" height="60" src="(( blog.user_image ))">
+                            <p class="uk-article-meta">发表于(( blog.created_at|datetime ))</p>
+                            </div>
+                            </div>
+                            <div class="info-blocks-in">
+                                <h3><a href="/blog/(( blog.id ))" class="waves-effect waves-dark">(( blog.name ))</a></h3>
+                        
+                                <p>(( blog.summary ))</p>
+                                <p><a href="/blog/(( blog.id )) class="waves-effect waves-dark">继续阅读</a></p>
+                            </div>
+                        </div> -->
+                    
+            {% endfor %}
+            </div>
+            
+
+            
+
+    </div>
+    <div class="navbar navbar-default navbar-static-top">
+<div class="container">
+    <div class="navbar-collapse collapse ">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/?page=1" class="waves-effect waves-dark "><<</a></li>
+                        {% for index in range(1,page.page_count+1) %}
+                            <li 
+                            {% if index == page.page_index %} class="active" {% endif %} 
+                            ><a class="waves-effect waves-dark" href="/?page=((index))">((index))</a></li>
+                        {% endfor %}
+
+                        <li><a href="/?page=((page.page_count))" class="waves-effect waves-dark ">>></a></li>
+                    </ul>
+
+        </div>
+        </div>
+    </div>
+    </section>
+
+    
+    
+
+  
+    
+{% endblock %}
